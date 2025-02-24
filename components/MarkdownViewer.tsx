@@ -1,11 +1,13 @@
-import { useRef } from "react";
+import { useRef, useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { FaPlay, FaPause, FaComments, FaBackward } from "react-icons/fa";
+import { ControlBar } from "./markdown/ControlBar";
+import { SettingsModal } from "./markdown/SettingsModal";
 
 interface MarkdownViewerProps {
   content: string;
   isPlaying: boolean;
+  isCompleted: boolean;
   onPlayPause: () => void;
   isChatOpen: boolean;
   onToggleChat: () => void;
@@ -15,12 +17,26 @@ interface MarkdownViewerProps {
 export default function MarkdownViewer({
   content,
   isPlaying,
+  isCompleted,
   onPlayPause,
   isChatOpen,
   onToggleChat,
   onReset,
 }: MarkdownViewerProps) {
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const markdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (markdownRef.current) {
+      const { scrollHeight, clientHeight } = markdownRef.current;
+      if (scrollHeight > clientHeight) {
+        markdownRef.current.scrollTo({
+          top: scrollHeight,
+          behavior: "smooth",
+        });
+      }
+    }
+  }, [content]);
 
   return (
     <div className="flex-1 h-full flex flex-col bg-white border-l relative">
@@ -30,30 +46,19 @@ export default function MarkdownViewer({
       >
         <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
       </div>
-      <div className="sticky bottom-0 z-10 bg-white border-t h-[70px] flex items-center justify-center px-4">
-        <div className="flex gap-4">
-          <button
-            onClick={onReset}
-            className="p-3 text-gray-600 hover:text-blue-600 transition-colors"
-            title="Back to the previous sentence"
-          >
-            <FaBackward size={16} />
-          </button>
-          <button
-            onClick={onPlayPause}
-            className="p-3 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-colors"
-          >
-            {isPlaying ? <FaPause size={16} /> : <FaPlay size={16} />}
-          </button>
-          <button
-            onClick={onToggleChat}
-            className="p-3 text-gray-600 hover:text-blue-600 transition-colors"
-            title={isChatOpen ? "Close chat" : "Open chat"}
-          >
-            <FaComments size={20} />
-          </button>
-        </div>
-      </div>
+      <ControlBar
+        isPlaying={isPlaying}
+        isCompleted={isCompleted}
+        isChatOpen={isChatOpen}
+        onPlayPause={onPlayPause}
+        onReset={onReset}
+        onToggleChat={onToggleChat}
+        onOpenSettings={() => setIsSettingsOpen(true)}
+      />
+      <SettingsModal
+        isOpen={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
+      />
     </div>
   );
 }

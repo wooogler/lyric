@@ -28,7 +28,7 @@ export default function TextEditor({
     update(highlights, tr) {
       if (highlightIndex === -1) return Decoration.none;
 
-      let decorations: Range<Decoration>[] = [];
+      let decorations: any[] = [];
       let pos = 0;
       sentences.forEach((sentence, index) => {
         if (index === highlightIndex) {

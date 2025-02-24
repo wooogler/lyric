@@ -15,7 +15,7 @@ export default function Home() {
   const [isPlaying, setIsPlaying] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const [messages, setMessages] = useState<Message[]>([
-    { id: 1, text: "안녕하세요! 무엇을 도와드릴까요?", isUser: false },
+    { id: 1, text: "", isUser: false },
     { id: 2, text: "CHOIR 프로젝트에 대해 알고 싶어요.", isUser: true },
     {
       id: 3,
@@ -24,13 +24,20 @@ export default function Home() {
     },
   ]);
   const [isChatOpen, setIsChatOpen] = useState(true);
+  const [isCompleted, setIsCompleted] = useState(false);
 
   const sentences = split(inputText)
     .filter((node) => node.type === "Sentence")
     .map((node) => node.raw);
 
   const handlePlayPause = () => {
-    setIsPlaying((prev) => !prev);
+    if (isCompleted) {
+      setHighlightIndex(-1);
+      setIsCompleted(false);
+      setIsPlaying(true);
+    } else {
+      setIsPlaying((prev) => !prev);
+    }
   };
 
   useEffect(() => {
@@ -41,7 +48,8 @@ export default function Home() {
             return prev + 1;
           } else {
             setIsPlaying(false);
-            return -1;
+            setIsCompleted(true);
+            return sentences.length - 1;
           }
         });
       }, 2000);
@@ -107,6 +115,7 @@ export default function Home() {
         <MarkdownViewer
           content={markdownText}
           isPlaying={isPlaying}
+          isCompleted={isCompleted}
           onPlayPause={handlePlayPause}
           isChatOpen={isChatOpen}
           onToggleChat={() => setIsChatOpen(!isChatOpen)}
