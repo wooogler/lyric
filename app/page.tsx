@@ -6,7 +6,6 @@ import TextEditor from "@/components/TextEditor";
 import MarkdownViewer from "@/components/MarkdownViewer";
 import ChatInterface from "@/components/ChatInterface";
 import { defaultInputText, MARKDOWN_SECTIONS } from "@/constants";
-import { Message } from "@/types";
 import { usePlayerStore } from "@/store/usePlayerStore";
 import { PlayerState } from "@/store/usePlayerStore";
 
@@ -22,15 +21,6 @@ export default function Home() {
   const [markdownText, setMarkdownText] = useState("");
   const [isPlaying, setIsPlaying] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
-  const [messages, setMessages] = useState<Message[]>([
-    { id: 1, text: "", isUser: false },
-    { id: 2, text: "CHOIR 프로젝트에 대해 알고 싶어요.", isUser: true },
-    {
-      id: 3,
-      text: "CHOIR는 조직의 지식 관리를 위한 챗봇 시스템입니다.",
-      isUser: false,
-    },
-  ]);
 
   useEffect(() => {
     const newSentences = split(inputText)
@@ -75,7 +65,7 @@ export default function Home() {
         clearInterval(timerRef.current);
       }
     };
-  }, [isPlaying, sentences.length]);
+  }, [isPlaying, sentences.length, setHighlightIndex, setIsCompleted]);
 
   useEffect(() => {
     if (highlightIndex >= 0) {
@@ -88,15 +78,6 @@ export default function Home() {
       setMarkdownText("");
     }
   }, [highlightIndex]);
-
-  const handleSendMessage = (message: string) => {
-    const newMessage = {
-      id: messages.length + 1,
-      text: message,
-      isUser: true,
-    };
-    setMessages((prev) => [...prev, newMessage]);
-  };
 
   const handleReset = () => {
     if (highlightIndex > 0) {

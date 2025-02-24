@@ -1,5 +1,4 @@
 import { useState, useRef, useEffect } from "react";
-import { Message } from "@/types";
 import { usePlayerStore } from "@/store/usePlayerStore";
 
 export default function ChatInterface() {

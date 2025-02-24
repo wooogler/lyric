@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import CodeMirror from "@uiw/react-codemirror";
 import { EditorView, Decoration } from "@codemirror/view";
 import { StateField } from "@codemirror/state";
@@ -25,10 +26,10 @@ export default function TextEditor({
     create() {
       return Decoration.none;
     },
-    update(highlights, tr) {
+    update() {
       if (highlightIndex === -1) return Decoration.none;
 
-      let decorations: any[] = [];
+      const decorations: any[] = [];
       let pos = 0;
       sentences.forEach((sentence, index) => {
         if (index === highlightIndex) {
