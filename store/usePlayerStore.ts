@@ -65,7 +65,7 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
               },
               {
                 id: Date.now() + 1,
-                text: "Would you like me to explain this sentence in more detail?",
+                text: 'Would you like me to explain "people" in this sentence?',
                 isUser: false,
               },
             ],
