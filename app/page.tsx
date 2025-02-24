@@ -7,11 +7,19 @@ import MarkdownViewer from "@/components/MarkdownViewer";
 import ChatInterface from "@/components/ChatInterface";
 import { defaultInputText, MARKDOWN_SECTIONS } from "@/constants";
 import { Message } from "@/types";
+import { usePlayerStore } from "@/store/usePlayerStore";
+import { PlayerState } from "@/store/usePlayerStore";
 
 export default function Home() {
+  const {
+    isCompleted,
+    setIsCompleted,
+    setSentences,
+    highlightIndex,
+    setHighlightIndex,
+  } = usePlayerStore();
   const [inputText, setInputText] = useState(defaultInputText);
   const [markdownText, setMarkdownText] = useState("");
-  const [highlightIndex, setHighlightIndex] = useState(-1);
   const [isPlaying, setIsPlaying] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const [messages, setMessages] = useState<Message[]>([
@@ -23,12 +31,15 @@ export default function Home() {
       isUser: false,
     },
   ]);
-  const [isChatOpen, setIsChatOpen] = useState(false);
-  const [isCompleted, setIsCompleted] = useState(false);
 
-  const sentences = split(inputText)
-    .filter((node) => node.type === "Sentence")
-    .map((node) => node.raw);
+  useEffect(() => {
+    const newSentences = split(inputText)
+      .filter((node) => node.type === "Sentence")
+      .map((node) => node.raw);
+    setSentences(newSentences);
+  }, [inputText, setSentences]);
+
+  const sentences = usePlayerStore((state) => state.sentences);
 
   const handlePlayPause = () => {
     if (isCompleted) {
@@ -101,7 +112,11 @@ export default function Home() {
       <div
         className={`
         flex flex-1 transition-[max-width] duration-300 ease-in-out
-        ${isChatOpen ? "max-w-[calc(100%-400px)]" : "max-w-full"}
+        ${
+          usePlayerStore((state: PlayerState) => state.isChatOpen)
+            ? "max-w-[calc(100%-400px)]"
+            : "max-w-full"
+        }
       `}
       >
         <div className="flex-1 h-full p-4 max-w-[50%]">
@@ -118,16 +133,12 @@ export default function Home() {
           isCompleted={isCompleted}
           highlightIndex={highlightIndex}
           onPlayPause={handlePlayPause}
-          isChatOpen={isChatOpen}
-          onToggleChat={() => setIsChatOpen(!isChatOpen)}
+          isChatOpen={usePlayerStore((state) => state.isChatOpen)}
+          onToggleChat={usePlayerStore((state) => state.toggleChat)}
           onReset={handleReset}
         />
       </div>
-      <ChatInterface
-        messages={messages}
-        onSendMessage={handleSendMessage}
-        isChatOpen={isChatOpen}
-      />
+      <ChatInterface />
     </div>
   );
 }

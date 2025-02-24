@@ -1,33 +1,43 @@
 import { create } from "zustand";
+import { Message } from "@/types";
 
-interface PlayerState {
+export interface PlayerState {
   isPlaying: boolean;
   isCompleted: boolean;
   highlightIndex: number;
   isChatOpen: boolean;
   sentences: string[];
+  messages: Message[];
 
   // actions
   setIsPlaying: (playing: boolean) => void;
   setIsCompleted: (completed: boolean) => void;
-  setHighlightIndex: (index: number) => void;
+  setHighlightIndex: (index: number | ((prev: number) => number)) => void;
   setIsChatOpen: (open: boolean) => void;
   setSentences: (sentences: string[]) => void;
   reset: () => void;
   toggleChat: () => void;
   togglePlayPause: () => void;
+  setMessages: (messages: Message[]) => void;
+  addMessage: (message: Message) => void;
+  clearMessages: () => void;
 }
 
-export const usePlayerStore = create<PlayerState>((set) => ({
+export const usePlayerStore = create<PlayerState>((set, get) => ({
   isPlaying: false,
   isCompleted: false,
   highlightIndex: -1,
   isChatOpen: false,
   sentences: [],
+  messages: [],
 
   setIsPlaying: (playing) => set({ isPlaying: playing }),
   setIsCompleted: (completed) => set({ isCompleted: completed }),
-  setHighlightIndex: (index) => set({ highlightIndex: index }),
+  setHighlightIndex: (index) =>
+    set((state) => ({
+      highlightIndex:
+        typeof index === "function" ? index(state.highlightIndex) : index,
+    })),
   setIsChatOpen: (open) => set({ isChatOpen: open }),
   setSentences: (sentences) => set({ sentences }),
 
@@ -39,9 +49,36 @@ export const usePlayerStore = create<PlayerState>((set) => ({
     }),
 
   toggleChat: () =>
-    set((state) => ({
-      isChatOpen: !state.isChatOpen,
-    })),
+    set((state) => {
+      if (!state.isChatOpen) {
+        if (
+          state.highlightIndex >= 0 &&
+          state.sentences[state.highlightIndex]
+        ) {
+          return {
+            isChatOpen: true,
+            messages: [
+              {
+                id: Date.now(),
+                text: `> ${state.sentences[state.highlightIndex]}`,
+                isUser: false,
+              },
+              {
+                id: Date.now() + 1,
+                text: "Would you like me to explain this sentence in more detail?",
+                isUser: false,
+              },
+            ],
+          };
+        }
+        return { isChatOpen: true };
+      } else {
+        return {
+          isChatOpen: false,
+          messages: [],
+        };
+      }
+    }),
 
   togglePlayPause: () =>
     set((state) => {
@@ -54,4 +91,12 @@ export const usePlayerStore = create<PlayerState>((set) => ({
       }
       return { isPlaying: !state.isPlaying };
     }),
+
+  setMessages: (messages) => set({ messages }),
+  addMessage: (message) =>
+    set((state) => ({
+      messages: [...state.messages, message],
+    })),
+
+  clearMessages: () => set({ messages: [] }),
 }));

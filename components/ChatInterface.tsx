@@ -1,17 +1,9 @@
 import { useState, useRef, useEffect } from "react";
 import { Message } from "@/types";
+import { usePlayerStore } from "@/store/usePlayerStore";
 
-interface ChatInterfaceProps {
-  messages: Message[];
-  onSendMessage: (message: string) => void;
-  isChatOpen: boolean;
-}
-
-export default function ChatInterface({
-  messages,
-  onSendMessage,
-  isChatOpen,
-}: ChatInterfaceProps) {
+export default function ChatInterface() {
+  const { messages, isChatOpen, addMessage } = usePlayerStore();
   const [inputValue, setInputValue] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -43,7 +35,11 @@ export default function ChatInterface({
       e.preventDefault();
       const trimmedValue = inputValue.trim();
       if (trimmedValue) {
-        onSendMessage(trimmedValue);
+        addMessage({
+          id: Date.now(),
+          text: trimmedValue,
+          isUser: true,
+        });
         setInputValue("");
         if (textareaRef.current) {
           textareaRef.current.style.height = "56px";
@@ -59,9 +55,8 @@ export default function ChatInterface({
   return (
     <div
       className={`
-        h-screen flex flex-col bg-white border-l
-        transition-all duration-300 ease-in-out
-        ${isChatOpen ? "w-[400px] opacity-100" : "w-0 opacity-0"}
+        w-[400px] h-screen bg-white border-l transition-[max-width] duration-300 ease-in-out overflow-hidden
+        ${isChatOpen ? "max-w-[400px]" : "max-w-0"}
       `}
     >
       <div
@@ -83,11 +78,15 @@ export default function ChatInterface({
               <div
                 className={
                   message.isUser
-                    ? "w-[70%] rounded-lg p-3 bg-gray-100 text-gray-900"
+                    ? "max-w-[70%] rounded-lg p-3 bg-gray-100 text-gray-900 break-words"
+                    : message.text.startsWith(">")
+                    ? "w-full pl-4 border-l-4 border-gray-300 text-gray-600 mb-2"
                     : "w-full text-gray-900"
                 }
               >
-                {message.text}
+                {message.text.startsWith(">")
+                  ? message.text.slice(2)
+                  : message.text}
               </div>
             </div>
           ))}
