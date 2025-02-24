@@ -77,7 +77,7 @@ export default function ChatInterface() {
               <div
                 className={
                   message.isUser
-                    ? "max-w-[70%] rounded-lg p-3 bg-gray-100 text-gray-900 break-words"
+                    ? "max-w-[80%] rounded-lg p-3 bg-gray-100 text-gray-900 break-words"
                     : message.text.startsWith(">")
                     ? "w-full pl-4 border-l-4 border-gray-300 text-gray-600 mb-2"
                     : "w-full text-gray-900"
