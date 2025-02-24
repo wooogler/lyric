@@ -23,7 +23,7 @@ export default function Home() {
       isUser: false,
     },
   ]);
-  const [isChatOpen, setIsChatOpen] = useState(true);
+  const [isChatOpen, setIsChatOpen] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
 
   const sentences = split(inputText)
@@ -116,6 +116,7 @@ export default function Home() {
           content={markdownText}
           isPlaying={isPlaying}
           isCompleted={isCompleted}
+          highlightIndex={highlightIndex}
           onPlayPause={handlePlayPause}
           isChatOpen={isChatOpen}
           onToggleChat={() => setIsChatOpen(!isChatOpen)}

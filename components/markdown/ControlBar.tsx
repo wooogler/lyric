@@ -12,6 +12,7 @@ interface ControlBarProps {
   isPlaying: boolean;
   isCompleted: boolean;
   isChatOpen: boolean;
+  highlightIndex: number;
   onPlayPause: () => void;
   onReset: () => void;
   onToggleChat: () => void;
@@ -22,6 +23,7 @@ export function ControlBar({
   isPlaying,
   isCompleted,
   isChatOpen,
+  highlightIndex,
   onPlayPause,
   onReset,
   onToggleChat,
@@ -43,7 +45,7 @@ export function ControlBar({
           icon={FaBackward}
           onClick={onReset}
           title="Back to the previous sentence"
-          disabled={isPlaying}
+          disabled={isPlaying || highlightIndex <= 0}
         />
         <IconButton
           icon={PlayIcon}
@@ -56,7 +58,7 @@ export function ControlBar({
           onClick={onToggleChat}
           title={isChatOpen ? "Close chat" : "Open chat"}
           size={20}
-          disabled={isPlaying}
+          disabled={isPlaying || highlightIndex === -1}
         />
       </div>
     </div>

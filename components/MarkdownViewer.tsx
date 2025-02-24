@@ -8,6 +8,7 @@ interface MarkdownViewerProps {
   content: string;
   isPlaying: boolean;
   isCompleted: boolean;
+  highlightIndex: number;
   onPlayPause: () => void;
   isChatOpen: boolean;
   onToggleChat: () => void;
@@ -18,6 +19,7 @@ export default function MarkdownViewer({
   content,
   isPlaying,
   isCompleted,
+  highlightIndex,
   onPlayPause,
   isChatOpen,
   onToggleChat,
@@ -50,6 +52,7 @@ export default function MarkdownViewer({
         isPlaying={isPlaying}
         isCompleted={isCompleted}
         isChatOpen={isChatOpen}
+        highlightIndex={highlightIndex}
         onPlayPause={onPlayPause}
         onReset={onReset}
         onToggleChat={onToggleChat}
